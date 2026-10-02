@@ -1,0 +1,7 @@
+# 本地保留可填 API_KEY 的版本，不入库
+*.local.user.js
+
+# 工具/系统文件
+.mimosa/
+.DS_Store
+.zcodeignore
