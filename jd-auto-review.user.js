@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         京东AI评价助手（全自动闭环）
-// @version      1.1
+// @version      1.2
 // @namespace    https://github.com/yupaiLy/jd-auto-review
 // @description  一个「开始/暂停」按钮控制的全自动评价闭环：评价列表→自动填评（大模型生成+打五星+晒单图配图）→发表→返回列表→进入下一单，循环至列表清空。适配京东新版评价中心（comment.m.jd.com/pc-static）。
 // @author       twopair
@@ -66,7 +66,27 @@
     function setRunning(v) {
         running = v;
         try { v ? localStorage.setItem(LOOP_KEY, '1') : localStorage.removeItem(LOOP_KEY); } catch (e) {}
+        v ? takeOverWindowOpen() : restoreWindowOpen();
         renderToggleBtn();
+    }
+
+    // 循环激活期间持续接管 window.open：所有"新开标签页"一律改为当前页跳转。
+    // 京东部分入口并非在点击的同步调用栈里开新页（有埋点/事件总线延时），只在点击
+    // 瞬间临时拦截会漏网，导致每评一单堆积一个标签页；循环运行中持续接管最稳妥。
+    // 循环停止（暂停/结束）后立即还原，不影响正常浏览。
+    let origWindowOpen = null;
+    function takeOverWindowOpen() {
+        if (origWindowOpen) return;
+        origWindowOpen = window.open;
+        window.open = function(url) {
+            try { if (url) location.href = url; } catch (e) {}
+            return null;
+        };
+    }
+    function restoreWindowOpen() {
+        if (!origWindowOpen) return;
+        try { window.open = origWindowOpen; } catch (e) {}
+        origWindowOpen = null;
     }
     function getSkipCount() {
         try { return parseInt(localStorage.getItem(SKIP_KEY) || '0', 10) || 0; } catch (e) { return 0; }
@@ -774,7 +794,9 @@
         }
 
         if (running) {
-            // 循环中：自动执行本页步骤。发表页表单异步加载，先留 2.5s 等接口渲染；其余步骤自带倒计时。
+            // 循环中：先接管 window.open（防新标签页堆积），再自动执行本页步骤。
+            // 发表页表单异步加载，先留 2.5s 等接口渲染；其余步骤自带倒计时。
+            takeOverWindowOpen();
             if (currentStep === startPublishProcess) {
                 updateStatus('循环中，2秒后开始本单评价...', 'blue');
                 setTimeout(function() { if (running) startPublishProcess(); }, 2500);
