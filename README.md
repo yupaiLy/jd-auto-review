@@ -11,7 +11,10 @@
 ### 1. 安装
 
 1. 浏览器安装 [Tampermonkey](https://www.tampermonkey.net/) 扩展。
-2. 下载本仓库的 [`jd-auto-review.user.js`](https://github.com/yupaiLy/jd-auto-review/raw/main/jd-auto-review.user.js)，打开 Tampermonkey → **管理面板 → 实用工具 → 导入**，选择该文件；或 Tampermonkey → **「＋」新建脚本**，粘贴全文保存。
+2. **直接安装（推荐）**：打开 [Greasy Fork 脚本页](https://greasyfork.org/zh-CN/scripts/598384)，点击页面上的绿色 **安装此脚本** 按钮，Tampermonkey 会自动弹出安装确认。
+3. **手动安装（备用）**：下载本仓库的 [`jd-auto-review.user.js`](https://github.com/yupaiLy/jd-auto-review/raw/main/jd-auto-review.user.js)，打开 Tampermonkey → **管理面板 → 实用工具 → 导入**，选择该文件；或 Tampermonkey → **「＋」新建脚本**，粘贴全文保存。
+
+> ✅ 通过 Greasy Fork 安装可自动接收后续更新；手动安装后如需更新，重新覆盖导入即可。
 
 ### 2. 配置
 
